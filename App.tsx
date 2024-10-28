@@ -1,40 +1,25 @@
+// App.tsx (o App.js)
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import PantallaInicio from './screens/PantallaInicio';
-import FormularioReporte from './screens/PantallaFormulario';
-import { enableScreens } from 'react-native-screens';
+import PantallaInicio from './screens/Home';
+import FormularioReporte from './screens/Formulario';
 
-
-// Define el tipo de parámetros que recibe cada pantalla en el stack
+// Define el tipo de parámetros del stack
 export type RootStackParamList = {
-  Inicio: undefined;         // PantallaInicio no recibe parámetros
-  Formulario: undefined;     // FormularioReporte no recibe parámetros
+  Home: undefined;  // Aquí puedes agregar más parámetros si los necesitas
+  Formulario: undefined;
 };
-enableScreens();
-// Crear el stack de navegación
-const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const App = () => {
+const Stack = createNativeStackNavigator<RootStackParamList>(); // Asegúrate de incluir el tipo aquí
+
+export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Inicio">
-        {/* Pantalla Inicio */}
-        <Stack.Screen 
-          name="Inicio" 
-          component={PantallaInicio} 
-          options={{ title: 'Inicio' }} // Personaliza el título si deseas
-        />
-
-        {/* Pantalla de Formulario */}
-        <Stack.Screen 
-          name="Formulario" 
-          component={FormularioReporte} 
-          options={{ title: 'Formulario de Reporte' }} // Personaliza el título si deseas
-        />
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={PantallaInicio} />
+        <Stack.Screen name="Formulario" component={FormularioReporte} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-};
-
-export default App;
+}

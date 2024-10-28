@@ -4,7 +4,7 @@
 
 import 'react-native';
 import React from 'react';
-import App from '../screens/PantallaFormulario';
+import App from '../screens/Formulario';
 
 // Note: import explicitly to use the types shipped with jest.
 import {it} from '@jest/globals';

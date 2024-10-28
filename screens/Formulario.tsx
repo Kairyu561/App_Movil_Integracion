@@ -3,8 +3,10 @@ import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity, Ale
 import { Picker } from '@react-native-picker/picker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import App, { RootStackParamList } from '../App';
 import { useNavigation } from '@react-navigation/native';
+import PantallaInicio from './Home';
+
 
 type FormularioReporteProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Formulario'>;
@@ -15,6 +17,7 @@ const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation }) => 
   const [descripcion, setDescripcion] = useState('');
   const [categoria, setCategoria] = useState('Mantencion de Calles');
   const [imagen, setImagen] = useState<string | null>(null);
+  
 
   // Función para seleccionar una imagen desde la galería
   const seleccionarImagen = () => {
@@ -103,7 +106,6 @@ const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation }) => 
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>Atrás</Text>
       </TouchableOpacity>
-
       <Text style={styles.title}>Reportar</Text>
 
       <Text style={styles.label}>Título</Text>
@@ -129,6 +131,7 @@ const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation }) => 
         style={styles.picker}
         onValueChange={(itemValue) => setCategoria(itemValue)}
       >
+        <Picker.Item label="Seleccione una Categoria" value="Seleccion" />
         <Picker.Item label="Mantención de Calles" value="Mantencion de Calles" />
         <Picker.Item label="Áreas Verdes" value="Areas Verdes" />
         <Picker.Item label="Asistencia Social" value="Asistencia Social" />
@@ -195,3 +198,4 @@ const styles = StyleSheet.create({
 });
 
 export default FormularioReporte;
+
