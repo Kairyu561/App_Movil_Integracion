@@ -2,22 +2,21 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { useNavigation } from '@react-navigation/native';
-
 
 type FormularioReporteProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Formulario'>;
 };
 
-const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation}) => {
+const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation }) => {
   const [titulo, setTitulo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [categoria, setCategoria] = useState('Mantencion de Calles');
   const [imagen, setImagen] = useState<string | null>(null);
-  
 
+  // Función para seleccionar una imagen desde la galería
   const seleccionarImagen = () => {
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (response && response.assets && response.assets.length > 0) {
@@ -26,14 +25,77 @@ const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation}) => {
     });
   };
 
-  const enviarFormulario = () => {   
-    console.log({
-      titulo,
-      descripcion,
-      categoria,
-      imagen,
-  });
-    Alert.alert("Reporte enviado", "Su reporte ha sido enviado con éxito");
+  // Función para obtener el ID de la categoría
+  const obtenerIdCategoria = (categoria: string) => {
+    switch (categoria) {
+      case 'Mantencion de Calles':
+        return 1;
+      case 'Areas Verdes':
+        return 2;
+      case 'Asistencia Social':
+        return 3;
+      case 'Seguridad':
+        return 4;
+      default:
+        return 0;  // Valor por defecto si no hay una categoría válida
+    }
+  };
+
+  // Función para enviar el formulario
+  const enviarFormulario = async () => {
+    // Obtener la fecha y hora actuales en formato ISO
+    const fechaPublicacion = new Date().toISOString();
+
+    // Obtener el ID de la categoría y asignarlo a la situación también
+    const categoriaId = obtenerIdCategoria(categoria);
+
+    // Crear un objeto FormData para enviar los datos del formulario y la imagen
+    const formData = new FormData();
+    formData.append('usuario', '1');  // Ajusta el ID del usuario según corresponda
+    formData.append('junta_vecinal', '1');  // Ajusta según corresponda
+    formData.append('categoria', categoriaId.toString());
+    formData.append('situacion', categoriaId.toString());  // Situación igual a categoría
+    formData.append('departamento', '1');  // Ajusta según corresponda
+    formData.append('descripcion', descripcion);
+    formData.append('fecha_publicacion', fechaPublicacion);
+    formData.append('titulo', titulo);
+    formData.append('latitud', '-22.459850');
+    formData.append('longitud', '-68.933800');
+
+    // Agregar la imagen al FormData si existe
+    if (imagen) {
+      formData.append('imagen', {
+        uri: imagen,
+        type: 'image/jpeg',
+        name: 'reporte.jpg',
+      });
+    }
+
+    try {
+      // Enviar la solicitud POST al backend
+      const response = await fetch('https:optimistic-strength-production.up.railway.app/api/publicaciones/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        Alert.alert('Reporte enviado', 'Su reporte ha sido enviado con éxito');
+        setTitulo('');
+        setDescripcion('');
+        setCategoria('Mantencion de Calles');
+        setImagen(null);
+      } else {
+        const errorData = await response.json();
+        console.error('Error en la respuesta:', errorData);
+        Alert.alert('Error', 'Hubo un problema al enviar el reporte');
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      Alert.alert('Error', 'No se pudo conectar con el servidor');
+    }
   };
 
   return (
@@ -67,7 +129,6 @@ const FormularioReporte: React.FC<FormularioReporteProps> = ({ navigation}) => {
         style={styles.picker}
         onValueChange={(itemValue) => setCategoria(itemValue)}
       >
-        <Picker.Item label="Seleccione una Categoria" value="SELECCION" />
         <Picker.Item label="Mantención de Calles" value="Mantencion de Calles" />
         <Picker.Item label="Áreas Verdes" value="Areas Verdes" />
         <Picker.Item label="Asistencia Social" value="Asistencia Social" />
@@ -88,11 +149,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-    padding: 10,
   },
   backButtonText: {
     fontSize: 16,
@@ -139,4 +195,3 @@ const styles = StyleSheet.create({
 });
 
 export default FormularioReporte;
-
